@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Target Feasibility Checker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #FFFFFF;
+            min-height: 100vh;
+            padding: 20px;
+            color: #000000;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 2px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid #E5E5E5;
+        }
+        
+        .header {
+            background: #D6B160;
+            color: #000000;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+        
+        .header p {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+        
+        .inputs-section {
+            padding: 40px;
+            background: #FAFAFA;
+            border-right: 2px solid #D6B160;
+        }
+        
+        .results-section {
+            padding: 40px;
+            background: white;
+        }
+        
+        .section-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1.4em;
+            margin-bottom: 30px;
+            color: #000000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            color: #000000;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #E5E5E5;
+            border-radius: 0;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #D6B160;
+            box-shadow: 0 0 0 3px rgba(214, 177, 96, 0.1);
+        }
+        
+        .auto-field {
+            background-color: #F5F5F5 !important;
+            color: #666666;
+            position: relative;
+        }
+        
+        .auto-field::after {
+            content: "AUTO-CALCULATED";
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: #D6B160;
+            pointer-events: none;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        .date-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .target-date-input {
+            flex: 1;
+        }
+        
+        .refresh-btn {
+            padding: 15px 20px;
+            background: #D6B160;
+            color: #000000;
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .refresh-btn:hover {
+            background: #C4A055;
+            transform: translateY(-1px);
+        }
+        
+        .calculate-btn {
+            width: 100%;
+            padding: 18px;
+            background: #000000;
+            color: #FFFFFF;
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .calculate-btn:hover {
+            background: #333333;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        .result-card {
+            background: #FAFAFA;
+            border: 1px solid #E5E5E5;
+            border-left: 4px solid #D6B160;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .result-card h3 {
+            color: #000000;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #E5E5E5;
+        }
+        
+        .metric:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label {
+            color: #666666;
+            font-weight: 500;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9em;
+        }
+        
+        .metric-value {
+            color: #000000;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9em;
+        }
+        
+        .warning {
+            background: #FFF5F5;
+            border-left-color: #DC3545;
+        }
+        
+        .success {
+            background: #F0FFF4;
+            border-left-color: #28A745;
+        }
+        
+        .highlight {
+            background: #FFF8E1;
+            border-left-color: #D6B160;
+        }
+        
+        .performance-indicator {
+            display: inline-block;
+            padding: 6px 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .high-risk {
+            background: #DC3545;
+            color: white;
+        }
+        
+        .medium-risk {
+            background: #FFC107;
+            color: #000000;
+        }
+        
+        .low-risk {
+            background: #28A745;
+            color: white;
+        }
+        
+        .no-data-message {
+            text-align: center;
+            color: #666666;
+            padding: 60px 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        
+        .no-data-message .icon {
+            font-size: 3em;
+            color: #D6B160;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .inputs-section {
+                border-right: none;
+                border-bottom: 2px solid #D6B160;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .container {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sales Target Calculator</h1>
+            <p>Analyze your sales performance and determine the resources needed to hit your targets</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="inputs-section">
+                <h2 class="section-title">Input Your Data</h2>
+                
+                <div class="input-group">
+                    <label for="currentSales">Current Sales (AED)</label>
+                    <input type="number" id="currentSales" placeholder="Enter current sales amount">
+                </div>
+                
+                <div class="input-group">
+                    <label for="targetSales">Target Sales (AED)</label>
+                    <input type="number" id="targetSales" placeholder="Enter target sales amount">
+                </div>
+                
+                <div class="input-group">
+                    <label for="targetDate">Target Date</label>
+                    <div class="date-controls">
+                        <input type="date" id="targetDate" class="target-date-input">
+                        <button class="refresh-btn" onclick="setEndOfYear()" title="Set to end of current year">End of Year</button>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="daysRemaining">Days Remaining</label>
+                    <input type="number" id="daysRemaining" placeholder="Auto-calculated" class="auto-field" readonly>
+                </div>
+                
+                <div class="input-group">
+                    <label for="currentTeamSize">Current Team Size</label>
+                    <input type="number" id="currentTeamSize" placeholder="Enter team size">
+                </div>
+                
+                <div class="input-group">
+                    <label for="weeksWorked">Weeks Worked This Year</label>
+                    <input type="number" id="weeksWorked" placeholder="Enter weeks worked" step="0.1">
+                </div>
+                
+                <button class="calculate-btn" onclick="calculate()">Calculate Results</button>
+            </div>
+            
+            <div class="results-section">
+                <h2 class="section-title">Analysis Results</h2>
+                <div id="results">
+                    <div class="no-data-message">
+                        <span class="icon">📊</span>
+                        <strong>Ready to analyze your sales performance?</strong><br><br>
+                        Enter your data in the form on the left and click "Calculate Results" to see detailed insights about your sales targets, team performance, and resource requirements.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateDaysRemaining() {
+            const targetDate = document.getElementById('targetDate').value;
+            if (!targetDate) {
+                document.getElementById('daysRemaining').value = '';
+                return;
+            }
+            
+            const today = new Date();
+            const target = new Date(targetDate);
+            const diffTime = target - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            document.getElementById('daysRemaining').value = Math.max(0, diffDays);
+        }
+        
+        function setEndOfYear() {
+            const currentYear = new Date().getFullYear();
+            const endOfYear = new Date(currentYear, 11, 31); // December 31st
+            document.getElementById('targetDate').value = endOfYear.toISOString().split('T')[0];
+            calculateDaysRemaining();
+        }
+        
+        function formatCurrency(amount) {
+            if (amount >= 1000000000) {
+                return 'AED ' + (amount / 1000000000).toFixed(2) + 'B';
+            } else if (amount >= 1000000) {
+                return 'AED ' + (amount / 1000000).toFixed(2) + 'M';
+            } else if (amount >= 1000) {
+                return 'AED ' + (amount / 1000).toFixed(2) + 'K';
+            } else {
+                return 'AED ' + amount.toLocaleString();
+            }
+        }
+        
+        function getPerformanceClass(multiplier) {
+            if (multiplier > 2) return 'high-risk';
+            if (multiplier > 1.5) return 'medium-risk';
+            return 'low-risk';
+        }
+        
+        function getPerformanceText(multiplier) {
+            if (multiplier > 2) return 'High Risk';
+            if (multiplier > 1.5) return 'Challenging';
+            return 'Achievable';
+        }
+        
+        function validateInputs() {
+            const currentSales = parseFloat(document.getElementById('currentSales').value);
+            const targetSales = parseFloat(document.getElementById('targetSales').value);
+            const daysRemaining = parseFloat(document.getElementById('daysRemaining').value);
+            const currentTeamSize = parseFloat(document.getElementById('currentTeamSize').value);
+            const weeksWorked = parseFloat(document.getElementById('weeksWorked').value);
+            
+            if (!currentSales || !targetSales || !daysRemaining || !currentTeamSize || !weeksWorked) {
+                document.getElementById('results').innerHTML = `
+                    <div class="no-data-message">
+                        <span class="icon">⚠️</span>
+                        <strong>Missing Information</strong><br><br>
+                        Please fill in all required fields to calculate your sales analysis.
+                    </div>
+                `;
+                return false;
+            }
+            
+            return true;
+        }
+        
+        function calculate() {
+            if (!validateInputs()) return;
+            
+            // Get input values
+            const currentSales = parseFloat(document.getElementById('currentSales').value);
+            const targetSales = parseFloat(document.getElementById('targetSales').value);
+            const daysRemaining = parseFloat(document.getElementById('daysRemaining').value);
+            const currentTeamSize = parseFloat(document.getElementById('currentTeamSize').value);
+            const weeksWorked = parseFloat(document.getElementById('weeksWorked').value);
+            
+            // Calculate key metrics
+            const gap = targetSales - currentSales;
+            const weeksRemaining = daysRemaining / 7;
+            const salesPerAgentSoFar = currentSales / currentTeamSize;
+            const currentWeeklyRatePerAgent = salesPerAgentSoFar / weeksWorked;
+            const totalWeeklySalesNeeded = gap / weeksRemaining;
+            const weeklyRateNeededPerAgent = totalWeeklySalesNeeded / currentTeamSize;
+            const performanceMultiplier = weeklyRateNeededPerAgent / currentWeeklyRatePerAgent;
+            
+            // Projections
+            const projectedAdditionalSales = currentWeeklyRatePerAgent * currentTeamSize * weeksRemaining;
+            const projectedTotal = currentSales + projectedAdditionalSales;
+            const shortfall = targetSales - projectedTotal;
+            
+            // Agents needed
+            const agentsNeededForGap = gap / (currentWeeklyRatePerAgent * weeksRemaining);
+            
+            // Get target date for display
+            const targetDate = document.getElementById('targetDate').value;
+            const targetDateFormatted = targetDate ? new Date(targetDate).toLocaleDateString() : 'Not set';
+            
+            // Create results HTML
+            const resultsHTML = `
+                <div class="result-card highlight">
+                    <h3>Target Overview</h3>
+                    <div class="metric">
+                        <span class="metric-label">Sales Gap</span>
+                        <span class="metric-value">${formatCurrency(gap)}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Target Date</span>
+                        <span class="metric-value">${targetDateFormatted}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Time Remaining</span>
+                        <span class="metric-value">${daysRemaining} days (${weeksRemaining.toFixed(1)} weeks)</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Weekly Sales Needed</span>
+                        <span class="metric-value">${formatCurrency(totalWeeklySalesNeeded)}</span>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h3>Current Performance</h3>
+                    <div class="metric">
+                        <span class="metric-label">Sales per Agent (YTD)</span>
+                        <span class="metric-value">${formatCurrency(salesPerAgentSoFar)}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Weekly Rate per Agent</span>
+                        <span class="metric-value">${formatCurrency(currentWeeklyRatePerAgent)}</span>
+                    </div>
+                </div>
+                
+                <div class="result-card ${performanceMultiplier > 2 ? 'warning' : performanceMultiplier > 1.5 ? '' : 'success'}">
+                    <h3>Required Performance</h3>
+                    <div class="metric">
+                        <span class="metric-label">Weekly Rate Needed per Agent</span>
+                        <span class="metric-value">${formatCurrency(weeklyRateNeededPerAgent)}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Performance Increase</span>
+                        <span class="metric-value">
+                            ${performanceMultiplier.toFixed(2)}x 
+                            <span class="performance-indicator ${getPerformanceClass(performanceMultiplier)}">
+                                ${getPerformanceText(performanceMultiplier)}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Percentage Increase</span>
+                        <span class="metric-value">${((performanceMultiplier - 1) * 100).toFixed(0)}%</span>
+                    </div>
+                </div>
+                
+                <div class="result-card ${shortfall > 0 ? 'warning' : 'success'}">
+                    <h3>Realistic Projection</h3>
+                    <div class="metric">
+                        <span class="metric-label">Projected at Current Pace</span>
+                        <span class="metric-value">${formatCurrency(projectedTotal)}</span>
+                    </div>
+                    ${shortfall > 0 ? `
+                    <div class="metric">
+                        <span class="metric-label">Shortfall</span>
+                        <span class="metric-value">${formatCurrency(shortfall)}</span>
+                    </div>
+                    ` : `
+                    <div class="metric">
+                        <span class="metric-label">Surplus</span>
+                        <span class="metric-value">${formatCurrency(-shortfall)}</span>
+                    </div>
+                    `}
+                </div>
+                
+                <div class="result-card highlight">
+                    <h3>Resource Requirements</h3>
+                    <div class="metric">
+                        <span class="metric-label">Agents Needed (Current Performance)</span>
+                        <span class="metric-value">${Math.ceil(agentsNeededForGap)} agents</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Additional Agents Needed</span>
+                        <span class="metric-value">${Math.max(0, Math.ceil(agentsNeededForGap) - currentTeamSize)} agents</span>
+                    </div>
+                </div>
+                
+                <div class="result-card ${performanceMultiplier > 2 ? 'warning' : 'success'}">
+                    <h3>Recommendation</h3>
+                    <div style="padding: 15px 0; color: #000000; line-height: 1.6; font-family: 'Montserrat', sans-serif; font-weight: 400;">
+                        ${performanceMultiplier > 2 ? 
+                            `<strong>High Risk:</strong> The required ${performanceMultiplier.toFixed(2)}x performance increase is unrealistic. Consider hiring ${Math.ceil(agentsNeededForGap) - currentTeamSize} additional agents or revising the target to ${formatCurrency(projectedTotal)}.` :
+                            performanceMultiplier > 1.5 ?
+                            `<strong>Challenging but Possible:</strong> Requires significant process improvements and ${((performanceMultiplier - 1) * 100).toFixed(0)}% performance increase. Consider adding ${Math.ceil((agentsNeededForGap - currentTeamSize) / 2)} agents to reduce risk.` :
+                            `<strong>Achievable:</strong> Target is realistic with current team and ${((performanceMultiplier - 1) * 100).toFixed(0)}% performance improvement.`
+                        }
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('results').innerHTML = resultsHTML;
+        }
+        
+        // Event listeners
+        document.getElementById('targetDate').addEventListener('change', calculateDaysRemaining);
+        
+        // Initialize on page load - no auto-calculation, just setup
+        window.onload = function() {
+            // Only set up event listeners, no pre-filling or auto-calculation
+        };
+    </script>
+</body>
+</html>
